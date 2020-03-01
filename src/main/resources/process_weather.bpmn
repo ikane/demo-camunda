@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0evslia" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.0">
-  <bpmn:process id="Process_weather" name="Weather" isExecutable="true">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_0evslia" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.0">
+  <bpmn:process id="Process_weather" name="Weather" isExecutable="true" camunda:historyTimeToLive="10">
     <bpmn:startEvent id="StartEvent_1" name="Process started">
       <bpmn:outgoing>Flow_11q804s</bpmn:outgoing>
     </bpmn:startEvent>
@@ -9,7 +9,7 @@
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="Flow_11q804s" sourceRef="StartEvent_1" targetRef="Activity_0qwt2vq" />
     <bpmn:sequenceFlow id="Flow_1ijjfmi" sourceRef="Activity_0qwt2vq" targetRef="Gateway_1yv5ums" />
-    <bpmn:serviceTask id="Activity_0qwt2vq" name="Check weather">
+    <bpmn:serviceTask id="Activity_0qwt2vq" name="Check weather" camunda:class="com.example.workflow.CheckWeatherDelegate">
       <bpmn:incoming>Flow_11q804s</bpmn:incoming>
       <bpmn:outgoing>Flow_1ijjfmi</bpmn:outgoing>
     </bpmn:serviceTask>
@@ -18,9 +18,13 @@
       <bpmn:outgoing>Flow_0oytibl</bpmn:outgoing>
       <bpmn:outgoing>Flow_0qa24g3</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="Flow_0oytibl" name="Yes" sourceRef="Gateway_1yv5ums" targetRef="Event_0g82u8f" />
-    <bpmn:sequenceFlow id="Flow_0qa24g3" name="No" sourceRef="Gateway_1yv5ums" targetRef="Activity_11xjlp5" />
-    <bpmn:serviceTask id="Activity_11xjlp5" name="Print complaint about weather">
+    <bpmn:sequenceFlow id="Flow_0oytibl" name="Yes" sourceRef="Gateway_1yv5ums" targetRef="Event_0g82u8f">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{weatherOk}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0qa24g3" name="No" sourceRef="Gateway_1yv5ums" targetRef="Activity_11xjlp5">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{not weatherOk}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:serviceTask id="Activity_11xjlp5" name="Print complaint about weather" camunda:class="com.example.workflow.LoggingDelegate">
       <bpmn:incoming>Flow_0qa24g3</bpmn:incoming>
       <bpmn:outgoing>Flow_1oxsqjw</bpmn:outgoing>
     </bpmn:serviceTask>
